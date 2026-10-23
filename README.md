@@ -93,7 +93,67 @@ python -m app.main --demo
 
 ---
 
-## 4. Features & Highlights
+## 4. Setting Up Your Newsletters (Live Inbox Connection)
+
+You can connect Slothreader to your actual email inbox (Gmail, Fastmail, Outlook, iCloud, Yahoo) in under 2 minutes. It reads **any newsletter publisher** (Substack, Beehiiv, Mailchimp, Axios, etc.) across both technical and non-technical topics.
+
+> [!IMPORTANT]
+> **Privacy & Security Guarantees:**
+> - **Zero Risk / No Master Passwords:** You never enter your primary email password. You use a dedicated, revocable **App Password**.
+> - **100% Confidential (`.env` is never public):** Your credentials reside exclusively in a local `.env` file on your machine. This file is permanently blocked by [`.gitignore`](.gitignore) and will **never** be committed to Git or published online.
+> - **Read-Only Email Access:** Slothreader fetches messages with IMAP `BODY.PEEK[]`. It never alters message flags (unread emails stay unread) and never deletes or archives your emails.
+
+### Step 1: Create a "Newsletters" Label / Folder in Your Email
+1. In your email provider (e.g., Gmail):
+   - Create a label or folder named **`Newsletters`**.
+2. Set up an automatic filter so newsletters bypass your main inbox:
+   - In your email search bar, type `unsubscribe` (or add specific senders like `tldr.tech`, `substack.com`, `morningbrew.com`).
+   - Click **Create filter** ➔ Check **"Apply the label: Newsletters"** (and optionally check *"Skip the Inbox"* to keep your primary inbox at Inbox Zero!).
+
+### Step 2: Generate a Dedicated App Password
+- **For Gmail:**
+  1. Go to your [Google Account Security Settings](https://myaccount.google.com/security).
+  2. Confirm that **2-Step Verification** is turned ON.
+  3. Search for **"App Passwords"** (or open [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)).
+  4. Type `Slothreader` as the app name and click **Create**.
+  5. Copy the 16-character generated password (e.g. `abcd efgh ijkl mnop`).
+- **For Fastmail, Outlook, iCloud, or Yahoo:**
+  - Open Account Settings ➔ Security ➔ Generate an App Password for IMAP access.
+
+### Step 3: Create Your Private `.env` File
+In your `Slothreader` directory, create a `.env` file by copying the provided template:
+```bash
+# On Windows (PowerShell):
+Copy-Item .env.example .env
+
+# On Mac / Linux:
+cp .env.example .env
+```
+
+Open `.env` in any text editor and fill in your details:
+```ini
+# Local Ollama Settings
+OLLAMA_HOST="http://localhost:11434"
+GEMMA_MODEL="gemma2:2b"
+
+# Live Email Settings (Kept 100% private on your machine)
+IMAP_SERVER="imap.gmail.com"
+IMAP_PORT=993
+IMAP_USERNAME="your-email@gmail.com"
+IMAP_PASSWORD="your-16-character-app-password"
+IMAP_FOLDER="Newsletters"
+```
+
+### Step 4: Run Slothreader Live!
+Whenever you want your morning gazette compiled from your real unread newsletters:
+```bash
+python -m app.main --live
+```
+Slothreader will connect securely over TLS, strip all advertisements and tracking links, deduplicate matching stories across publishers using local **Gemma 2**, and display your daily newspaper in the terminal and browser!
+
+---
+
+## 5. Features & Highlights
 
 ### 📰 Cross-Source Story Deduplication
 When multiple newsletters cover the same breakthrough, Slothreader merges them into a single concise takeaway with publisher attribution tags (e.g. `[TLDR Tech + ByteByteGo + PyCoder's Weekly]`).
@@ -112,7 +172,7 @@ $$\text{Reading Time Saved (min)} = \frac{\text{Raw Ingested Words} - \text{Gaze
 
 ---
 
-## 5. Observability with Sentry Agent Tracing
+## 6. Observability with Sentry Agent Tracing
 
 Slothreader implements deep span-level telemetry using **Sentry Agent Tracing**:
 
@@ -135,7 +195,7 @@ sentry_sdk.init(
 
 ---
 
-## 6. Privacy Guarantees
+## 7. Privacy Guarantees
 
 1. **100% On-Device Inference:** Ollama runs on `127.0.0.1:11434`. Zero email text leaves your machine.
 2. **Read-Only IMAP Access:** Fetching uses `BODY.PEEK[]` to ensure unread message flags (`\Seen`) are never modified.
@@ -143,7 +203,7 @@ sentry_sdk.init(
 
 ---
 
-## 7. Evaluation Benchmark
+## 8. Evaluation Benchmark
 
 | Metric | Target | Slothreader Result |
 |---|---|---|
@@ -155,7 +215,7 @@ sentry_sdk.init(
 
 ---
 
-## 8. Testing
+## 9. Testing
 
 Slothreader includes an exhaustive automated test suite covering deterministic ad stripping, privacy guarantees, IMAP safety, schema compliance, and output generation.
 
@@ -202,6 +262,6 @@ tests/test_privacy_guarantees.py::test_span_recording_retains_no_email_content P
 
 ---
 
-## 9. License
+## 10. License
 
 Distributed under the **Apache-2.0 License**. See [LICENSE](LICENSE) for full details.
