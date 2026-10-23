@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     # Local Ollama Inference
     ollama_host: str = "http://localhost:11434"
     gemma_model: str = "gemma2:2b"
-    inference_timeout_seconds: float = 120.0
+    inference_timeout_seconds: float = 300.0
 
     # Live IMAP Settings (read-only BODY.PEEK[])
     imap_server: str = "imap.gmail.com"
