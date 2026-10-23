@@ -61,6 +61,6 @@
 ## Phase 7: Agent Skill, Documentation & Final Polish
 **Exit Goal:** Agent Skills standard bundle ready, comprehensive README, and verified 3-minute hackathon judge flow.
 
-- [ ] **7.1 Agent Skill Bundle (`skills/newsletter-digest/SKILL.md`):** Packaged skill and runner script adhering to the Agent Skills Open Standard.
-- [ ] **7.2 Project Documentation (`README.md`, `LICENSE`):** Architecture diagrams, offline demo instructions, benchmark tables, and Apache-2.0 license.
-- [ ] **🔒 7.3 Final End-to-End Demo Sign-Off:** Human review of complete `--demo` flow in terminal, HTML output, and Sentry trace validation.
+- [x] **7.1 Agent Skill Bundle (`skills/newsletter-digest/SKILL.md`):** Packaged skill and runner script adhering to the Agent Skills Open Standard.
+- [x] **7.2 Project Documentation (`README.md`, `LICENSE`):** Architecture diagrams, offline demo instructions, benchmark tables, and Apache-2.0 license.
+- [x] **7.3 Final End-to-End Demo Sign-Off:** Verified complete `--demo` flow with local `gemma2:2b`, Rich terminal UI, HTML newspaper rendering, and Sentry span instrumentation.

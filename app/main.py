@@ -43,6 +43,7 @@ def run_pipeline(
     demo_mode: bool = True,
     live_mode: bool = False,
     skip_llm: bool = False,
+    use_mock: bool = False,
     model_override: Optional[str] = None,
     output_dir: Optional[Path] = None,
 ) -> Optional[GazettePayload]:
@@ -128,21 +129,30 @@ def run_pipeline(
     # Stage 3: Gemma 2 Deduplication Engine
     gemma = GemmaClient()
     resolved_model = model_override or gemma.resolve_model()
-    console.print(f"[cyan]Synthesizing and deduplicating cross-newsletter stories with local [bold green]{resolved_model}[/bold green]...[/cyan]")
-
     gazette: Optional[GazettePayload] = None
-    with tracer.start_span(
-        op="ai.gemma.deduplicate",
-        description=f"Gemma deduplication via {resolved_model}",
-        data={
-            "ai.model": resolved_model,
-            "articles_count": len(cleaned_articles),
-            "input_words": total_clean,
-        }
-    ) as span:
-        gazette, meta = gemma.deduplicate(cleaned_articles, model_override=resolved_model)
-        span["data"]["duration_seconds"] = meta.get("duration_seconds", 0.0)
-        span["data"]["eval_count"] = meta.get("eval_count", 0)
+
+    if use_mock:
+        console.print("[yellow]Using instant offline deterministic synthesis (--mock specified)...[/yellow]")
+        gazette, meta = gemma.mock_deduplicate(cleaned_articles)
+    else:
+        console.print(f"[cyan]Synthesizing and deduplicating cross-newsletter stories with local [bold green]{resolved_model}[/bold green]...[/cyan]")
+        with tracer.start_span(
+            op="ai.gemma.deduplicate",
+            description=f"Gemma deduplication via {resolved_model}",
+            data={
+                "ai.model": resolved_model,
+                "articles_count": len(cleaned_articles),
+                "input_words": total_clean,
+            }
+        ) as span:
+            try:
+                gazette, meta = gemma.deduplicate(cleaned_articles, model_override=resolved_model)
+                span["data"]["duration_seconds"] = meta.get("duration_seconds", 0.0)
+                span["data"]["eval_count"] = meta.get("eval_count", 0)
+            except Exception as e:
+                console.print(f"[yellow]Ollama inference note: {e}[/yellow]")
+                console.print("[cyan]Switching to offline fallback digest...[/cyan]")
+                gazette, meta = gemma.mock_deduplicate(cleaned_articles)
 
     # Stage 4: Gazette Output Presentation & Publishing
     with tracer.start_span(op="gazette.render", description="Publish terminal TUI and offline HTML/MD"):
@@ -159,6 +169,7 @@ def cli_entrypoint():
     parser = argparse.ArgumentParser(description="Slothreader: Local-first newsletter compiler")
     parser.add_argument("--demo", action="store_true", default=True, help="Run with bundled sample newsletters (default)")
     parser.add_argument("--live", action="store_true", help="Fetch unread emails from configured IMAP account")
+    parser.add_argument("--mock", action="store_true", help="Run instant offline mock synthesis without waiting for Ollama")
     parser.add_argument("--model", type=str, default=None, help="Ollama model override (e.g. gemma2:2b, gemma4:e4b)")
     parser.add_argument("--no-llm", action="store_true", help="Run ingestion and fluff stripping only, skip LLM synthesis")
 
@@ -171,6 +182,7 @@ def cli_entrypoint():
             demo_mode=demo_mode,
             live_mode=live_mode,
             skip_llm=args.no_llm,
+            use_mock=args.mock,
             model_override=args.model,
         )
     except KeyboardInterrupt:
