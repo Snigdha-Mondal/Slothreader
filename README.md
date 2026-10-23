@@ -9,6 +9,12 @@
 
 > **"Sloths conserve energy because the world moves too fast. Slothreader lets your computer do the reading so you can do the living."**
 
+<div align="center">
+  <img src="docs/images/sloth_gazette_top.png" alt="The Daily Sloth Gazette - Masthead & Sloth Badge" width="850" />
+  <p><em>The Daily Sloth Gazette: Retro 1-Page Offline Newspaper with Sloth Badge & Cross-Deduplicated News</em></p>
+  <img src="docs/images/sloth_gazette_bottom.png" alt="The Daily Sloth Gazette - Tool Radar & Concept of the Day" width="850" />
+</div>
+
 ---
 
 ## 1. Why Slothreader?
