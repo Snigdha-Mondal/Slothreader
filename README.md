@@ -176,9 +176,11 @@ $$\text{Reading Time Saved (min)} = \frac{\text{Raw Ingested Words} - \text{Gaze
 
 Slothreader implements deep span-level telemetry using **Sentry Agent Tracing**:
 
+![Sentry Agent Tracing Waterfall](docs/images/sentry_trace_waterfall.png)
+
 - **`email.fetch`:** Traces IMAP network latency and fixture loading.
 - **`email.clean`:** Tracks DOM sanitization throughput, sponsor counts, and word reduction.
-- **`ai.gemma.deduplicate`:** Monitors local inference latency, prompt token volume, and completion token metrics.
+- **`ai.gemma.deduplicate`:** Monitors local inference latency, prompt token volume, and completion token metrics with local Ollama HTTP client spans.
 - **`gazette.render`:** Captures TUI presentation and file generation timings.
 
 ### Privacy-Preserving Telemetry Configuration
