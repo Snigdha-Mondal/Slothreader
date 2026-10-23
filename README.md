@@ -155,15 +155,50 @@ sentry_sdk.init(
 
 ---
 
-## 8. Built with the AI Agent Loop
+## 8. Testing
 
-This repository was architected and developed using the **DeftBench AI Agent Loop** methodology:
-- [`PRD.md`](PRD.md): Product requirements, personas, and scope.
-- [`ARCHITECTURE.md`](ARCHITECTURE.md): System design and 6 locked fixed decisions.
-- [`ENGINEERING_PLAYBOOK.md`](ENGINEERING_PLAYBOOK.md): Operating manual, 9-step loop, and stop signs.
-- [`AGENTS.md`](AGENTS.md): Universal agent entry door.
-- [`BACKLOG.md`](BACKLOG.md): 7 sequential phases with testable slices.
-- [`PROGRESS.md`](PROGRESS.md): Persistent repository memory and decisions log.
+Slothreader includes an exhaustive automated test suite covering deterministic ad stripping, privacy guarantees, IMAP safety, schema compliance, and output generation.
+
+### Running the Test Suite
+```bash
+pytest tests/ -v
+```
+
+### Test Suite Structure
+| Test Suite | Purpose & Coverage |
+|---|---|
+| [`test_fluff_stripper.py`](tests/test_fluff_stripper.py) | Asserts 100% sponsor rejection, DOM tag stripping, and word count compression across 4 realistic newsletter formats. |
+| [`test_ingest.py`](tests/test_ingest.py) | Tests local demo fixture loading and verifies the TLS IMAP client strictly requests `BODY.PEEK[]` to preserve unread email status. |
+| [`test_gemma_schema.py`](tests/test_gemma_schema.py) | Validates Pydantic model serialization, required keys, multi-publisher source lists, and error handling for malformed LLM outputs. |
+| [`test_privacy_guarantees.py`](tests/test_privacy_guarantees.py) | Asserts `send_default_pii=False` and validates telemetry sanitizers guarantee zero email bodies, sender addresses, or subject lines ever reach Sentry. |
+| [`test_output.py`](tests/test_output.py) | Tests Rich terminal rendering, Markdown briefing generation, and offline retro HTML newspaper file compilation. |
+
+```text
+============================= test session starts =============================
+collected 19 items
+
+tests/test_fluff_stripper.py::test_tldr_cleaning_removes_sponsors_and_preserves_content PASSED
+tests/test_fluff_stripper.py::test_bytebytego_cleaning_removes_ads_and_preserves_concepts PASSED
+tests/test_fluff_stripper.py::test_pycoders_cleaning_removes_ads_and_preserves_tools PASSED
+tests/test_fluff_stripper.py::test_hacker_newsletter_cleaning_removes_ads PASSED
+tests/test_gemma_schema.py::test_gazette_payload_validation_success PASSED
+tests/test_gemma_schema.py::test_gazette_payload_missing_required_field_raises_error PASSED
+tests/test_gemma_schema.py::test_gemma_client_deduplicate_with_mock PASSED
+tests/test_ingest.py::test_local_loader_loads_four_fixtures PASSED
+tests/test_ingest.py::test_decode_mime_header PASSED
+tests/test_ingest.py::test_safe_imap_client_requires_credentials PASSED
+tests/test_ingest.py::test_safe_imap_client_uses_body_peek PASSED
+tests/test_output.py::test_render_html_contains_all_sections PASSED
+tests/test_output.py::test_render_markdown_contains_all_sections PASSED
+tests/test_output.py::test_save_gazette_files_creates_files PASSED
+tests/test_output.py::test_display_gazette_executes_without_error PASSED
+tests/test_privacy_guarantees.py::test_is_pii_key_detection PASSED
+tests/test_privacy_guarantees.py::test_sanitize_telemetry_data_strips_pii_and_arbitrary_text PASSED
+tests/test_privacy_guarantees.py::test_sentry_init_enforces_send_default_pii_false PASSED
+tests/test_privacy_guarantees.py::test_span_recording_retains_no_email_content PASSED
+
+============================= 19 passed in 3.00s =============================
+```
 
 ---
 
