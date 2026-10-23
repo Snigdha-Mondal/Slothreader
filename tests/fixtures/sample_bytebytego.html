@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ByteByteGo Systems Newsletter #104</title>
+</head>
+<body>
+    <div class="email-header">
+        <h1>ByteByteGo Systems Newsletter</h1>
+        <p>By Alex Xu — Explaining complex systems with simple diagrams.</p>
+    </div>
+
+    <div class="partner-ad" style="background:#e0f2fe; padding:15px; margin: 15px 0;">
+        <p><strong>Presented by Datadog:</strong> Observability for your GenAI and LLM pipelines. Trace token usage, latency bottlenecks, and error rates in real time. <a href="https://datadog.com">Start your free 14-day trial today!</a></p>
+    </div>
+
+    <section class="content">
+        <h2>Why Gemma 2's Sliding Window Attention Is an Engineering Win</h2>
+        <p>Google's Gemma 2 release introduces a compelling hardware-aware architectural choice: alternating between local sliding-window attention and standard global self-attention across layers. In standard attention, the key-value (KV) cache grows linearly with sequence length, consuming multiple gigabytes of VRAM on long documents. By restricting half of the layers to a local sliding window (e.g. 4096 tokens), Gemma 2 cuts KV cache memory consumption by approximately 50% without degrading downstream perplexity on long-context tasks. This makes running the 2B model on low-end edge devices and standard RAM truly viable.</p>
+
+        <h2>Concept of the Day: Consistent Hashing with Virtual Nodes</h2>
+        <p>When distributing keys across a cluster of database or cache nodes, standard modulo hashing (hash(key) % N) causes a devastating cache invalidation storm whenever a node is added or removed. Consistent hashing maps both servers and data keys to a circular 360-degree hash ring. When a server departs, only the keys immediately following it on the ring need relocation. By assigning dozens of "virtual nodes" to each physical machine, consistent hashing eliminates uneven key distribution and prevents single-node hotspots during scale-out events.</p>
+    </section>
+
+    <div class="partner-ad">
+        <p>A message from our partner Cloudflare: Zero Trust security for distributed engineering teams. Protect developer endpoints with ease.</p>
+    </div>
+
+    <footer class="email-footer">
+        <p>© 2026 ByteByteGo. All rights reserved. <a href="https://bytebytego.com/unsubscribe">Click here to manage your subscription</a>.</p>
+    </footer>
+</body>
+</html>

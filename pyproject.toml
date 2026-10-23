@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slothreader"
+version = "0.1.0"
+description = "The zero-effort, local-first morning gazette that rewards information laziness."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Slothreader Contributors" }
+]
+dependencies = [
+    "beautifulsoup4>=4.12.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "requests>=2.31.0",
+    "rich>=13.7.0",
+    "sentry-sdk>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[project.scripts]
+slothreader = "app.main:cli_entrypoint"

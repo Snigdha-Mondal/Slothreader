@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TLDR Tech 2026-10-23</title>
+    <style>
+        body { font-family: sans-serif; background: #fff; }
+        .nav { background: #eee; padding: 10px; }
+        .footer { font-size: 11px; color: #888; }
+        .sponsor { border: 1px dashed #f59e0b; padding: 12px; background: #fef3c7; }
+    </style>
+</head>
+<body>
+    <header class="nav">
+        <h1>TLDR</h1>
+        <p>Daily tech newsletter curated for 1,250,000+ developers.</p>
+        <a href="https://tldr.tech/web-view">View Online</a> | <a href="https://tldr.tech/advertise">Advertise</a>
+    </header>
+
+    <div class="sponsor">
+        <h3>[SPONSOR] Neon Serverless Postgres: Scale your database instantly</h3>
+        <p>Stop paying for idle compute. Neon serverless architecture separates storage and compute to let your Postgres databases branch in seconds and scale down to zero when idle. 
+        <a href="https://neon.tech/?ref=tldr">Claim $50 free compute credits today!</a></p>
+    </div>
+
+    <main>
+        <article class="story">
+            <h2>Google Releases Gemma 2 Open Weights: 2B and 9B Architectures</h2>
+            <p>Google has officially dropped Gemma 2 in 2-billion and 9-billion parameter variants. Designed from the ground up for efficient on-device execution, the 2B model achieves state-of-the-art results for lightweight models, running at over 80 tokens per second on consumer laptops. The architecture features alternating local sliding window attention and global attention layers, substantially trimming the KV-cache memory footprint while preserving long-context reasoning up to 8k tokens.</p>
+        </article>
+
+        <article class="story">
+            <h2>PostgreSQL 17 Officially Released</h2>
+            <p>The PostgreSQL Global Development Group announced PostgreSQL 17. The new release features significant improvements to vacuum memory utilization (up to 20x less memory), high-throughput logical replication failover control, and new JSON_TABLE capabilities for advanced document querying directly within SQL.</p>
+        </article>
+
+        <article class="story">
+            <h2>Git 2.47 Bundles Incremental Multi-Pack Indexes</h2>
+            <p>The Git project released version 2.47, highlighting incremental multi-pack indexes (MIDX) to drastically reduce repack overhead on massive mono-repositories. Server-side git fetch performance is estimated to improve by 15-30% on active repositories.</p>
+        </article>
+    </main>
+
+    <div class="sponsor">
+        <p>Sponsored by Warp: The intelligent terminal with built-in AI search and command palettes. Download now on Mac and Linux.</p>
+    </div>
+
+    <footer class="footer">
+        <p>You received this email because you subscribed to TLDR Tech.</p>
+        <p><a href="https://tldr.tech/unsubscribe?id=99281">Unsubscribe immediately</a> | <a href="https://tldr.tech/privacy">Privacy Policy</a></p>
+        <img src="https://tracking.tldr.tech/pixel.png?id=email_open_883" width="1" height="1" alt="" />
+    </footer>
+</body>
+</html>
