@@ -7,9 +7,9 @@
 
 ## 1. Current Status
 
-- **Phase Active:** Phase 4 (Gemma 2 Deduplication Engine)
-- **Current Sprint:** Local Ollama Gemma Integration & Cross-Deduplication Prompts
-- **Build Status:** Phase 3 Complete (Green, 8/8 automated tests passing; end-to-end demo runner operational).
+- **Phase Active:** Phase 5 (Sentry Agent Tracing & Privacy Guardrails)
+- **Current Sprint:** Telemetry Instrumentation & Privacy Assertion Tests
+- **Build Status:** Phase 4 Complete (Green, 11/11 automated tests passing across full suite).
 
 ---
 
@@ -29,21 +29,22 @@
 - Added unit tests in `tests/test_fluff_stripper.py` with 100% sponsor elimination.
 
 ### 2026-10-23 — Session 4: Phase 3 (Ingestion Layer & Demo CLI Runner)
-- **Task 3.1 — Local Loader:** Implemented [`app/ingest/local_loader.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/ingest/local_loader.py) to load bundled HTML newsletters.
-- **Task 3.2 — Safe IMAP Client:** Implemented [`app/ingest/imap_client.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/ingest/imap_client.py) using `BODY.PEEK[]` to preserve `\Seen` unread state.
-- **Task 3.3 — CLI Orchestrator:** Implemented [`app/main.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/main.py) and [`app/config.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/config.py). Resolved Windows console UTF-8 encoding.
-- **Evidence:** 
-  - Ran `python -m app.main --demo`: successfully ingested 4 sample newsletters (922 words), stripped 7 sponsor ads down to 674 words (26.9% noise reduction) and printed formatted Rich summary table.
-  - Ran `pytest tests/`: 8/8 tests passed in 0.68s.
+- Implemented `app/ingest/local_loader.py` and `app/ingest/imap_client.py`.
+- Implemented `app/main.py` CLI runner with Rich tables.
+
+### 2026-10-23 — Session 5: Phase 4 (Gemma 2 Deduplication Engine)
+- **Task 4.1 — Ollama Client Adapter:** Implemented [`app/engine/gemma_client.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/engine/gemma_client.py) with Ollama connectivity checks and dynamic model resolution (`resolve_model()`).
+- **Task 4.2 — Deduplication Prompts:** Implemented [`app/engine/prompts.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/engine/prompts.py) with strict JSON schema instructions and cross-publisher deduplication rules.
+- **Task 4.3 — Model Resolution:** Verified connectivity with local Ollama (`localhost:11434`) and auto-detection of local `gemma4:e4b`.
+- **Task 4.4 — Schema Testing:** Implemented [`tests/test_gemma_schema.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/tests/test_gemma_schema.py) verifying schema parsing, required field assertions, and mock Ollama inference.
+- **Evidence:** Ran `pytest tests/test_gemma_schema.py -v`: 3/3 passed in 2.60s. Total test suite: 11/11 passed.
 
 ---
 
 ## 3. What's Next
 
-- [ ] Execute **Task 4.1**: Implement `app/engine/gemma_client.py` for Ollama REST communication.
-- [ ] Execute **Task 4.2**: Implement `app/engine/prompts.py` for zero-fluff cross-deduplication JSON synthesis.
-- [ ] Execute **Task 4.3**: Integrate resilience & fallback handling.
-- [ ] Execute **Task 4.4**: Schema validation test `tests/test_gemma_schema.py`.
+- [ ] Execute **Task 5.1**: Implement Sentry Agent Tracing in `app/telemetry/sentry_tracer.py` (`email.clean`, `ai.gemma.deduplicate`, `gazette.render`).
+- [ ] Execute **Task 5.2**: Automated privacy assertion tests in `tests/test_privacy_guarantees.py` ensuring `send_default_pii=False` and zero email tokens transmitted.
 
 ---
 

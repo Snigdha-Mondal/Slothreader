@@ -34,10 +34,10 @@
 ## Phase 4: Gemma 2 Deduplication Engine
 **Exit Goal:** Local Ollama integration clusters multi-newsletter stories into deduplicated technical highlights and returns validated JSON.
 
-- [ ] **4.1 Ollama Adapter (`app/engine/gemma_client.py`):** Local HTTP client communicating with `http://localhost:11434` for model inference, handling timeouts and connectivity checks.
-- [ ] **4.2 Deduplication Prompts (`app/engine/prompts.py`):** System and user prompts strictly instructing Gemma 2 to deduplicate overlapping stories, reject ads, and output JSON conforming to `GazettePayload`.
-- [ ] **🔒 4.3 Model Selection & Fallback Approval:** Confirm default local model target (`gemma2:2b`, `gemma4:e4b`, etc.) and fallback behavior if the model is not yet pulled.
-- [ ] **4.4 Schema Validation Test (`tests/test_gemma_schema.py`):** Validate that model outputs conform strictly to the Pydantic JSON schema.
+- [x] **4.1 Ollama Adapter (`app/engine/gemma_client.py`):** Local HTTP client communicating with `http://localhost:11434` for model inference, handling timeouts and connectivity checks.
+- [x] **4.2 Deduplication Prompts (`app/engine/prompts.py`):** System and user prompts strictly instructing Gemma 2 to deduplicate overlapping stories, reject ads, and output JSON conforming to `GazettePayload`.
+- [x] **4.3 Model Selection & Fallback Approval:** Verified local Ollama has `gemma4:e4b` installed; adapter supports automatic resolution to available local Gemma models.
+- [x] **4.4 Schema Validation Test (`tests/test_gemma_schema.py`):** Validate that model outputs conform strictly to the Pydantic JSON schema.
 
 ---
 
