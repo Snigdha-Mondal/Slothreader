@@ -44,8 +44,8 @@
 ## Phase 5: Sentry Agent Tracing & Privacy Guardrails
 **Exit Goal:** Every pipeline step is instrumented with Sentry spans, with automated tests proving zero private email text is transmitted.
 
-- [ ] **5.1 Sentry Instrumentation (`app/telemetry/sentry_tracer.py`):** Spans for `email.clean`, `ai.gemma.deduplicate`, and `gazette.render` tracking latency, token metrics, and character compression.
-- [ ] **5.2 Privacy Verification Tests (`tests/test_privacy_guarantees.py`):** Automated tests confirming `send_default_pii=False` and verifying that no email subject, sender, or body text exists in Sentry payloads.
+- [x] **5.1 Sentry Instrumentation (`app/telemetry/sentry_tracer.py`):** Spans for `email.clean`, `ai.gemma.deduplicate`, and `gazette.render` tracking latency, token metrics, and character compression.
+- [x] **5.2 Privacy Verification Tests (`tests/test_privacy_guarantees.py`):** Automated tests confirming `send_default_pii=False` and verifying that no email subject, sender, or body text exists in Sentry payloads.
 
 ---
 

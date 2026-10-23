@@ -7,9 +7,9 @@
 
 ## 1. Current Status
 
-- **Phase Active:** Phase 5 (Sentry Agent Tracing & Privacy Guardrails)
-- **Current Sprint:** Telemetry Instrumentation & Privacy Assertion Tests
-- **Build Status:** Phase 4 Complete (Green, 11/11 automated tests passing across full suite).
+- **Phase Active:** Phase 6 (The Sloth Gazette Publisher & Sloth Badge)
+- **Current Sprint:** Rich TUI Presentation, Retro HTML Newspaper, and Sloth Badge Metrics
+- **Build Status:** Phase 5 Complete (Green, 15/15 automated tests passing).
 
 ---
 
@@ -33,18 +33,21 @@
 - Implemented `app/main.py` CLI runner with Rich tables.
 
 ### 2026-10-23 — Session 5: Phase 4 (Gemma 2 Deduplication Engine)
-- **Task 4.1 — Ollama Client Adapter:** Implemented [`app/engine/gemma_client.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/engine/gemma_client.py) with Ollama connectivity checks and dynamic model resolution (`resolve_model()`).
-- **Task 4.2 — Deduplication Prompts:** Implemented [`app/engine/prompts.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/engine/prompts.py) with strict JSON schema instructions and cross-publisher deduplication rules.
-- **Task 4.3 — Model Resolution:** Verified connectivity with local Ollama (`localhost:11434`) and auto-detection of local `gemma4:e4b`.
-- **Task 4.4 — Schema Testing:** Implemented [`tests/test_gemma_schema.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/tests/test_gemma_schema.py) verifying schema parsing, required field assertions, and mock Ollama inference.
-- **Evidence:** Ran `pytest tests/test_gemma_schema.py -v`: 3/3 passed in 2.60s. Total test suite: 11/11 passed.
+- Implemented `app/engine/gemma_client.py` and `app/engine/prompts.py`.
+- Validated JSON generation schema with 3 tests in `tests/test_gemma_schema.py`.
+
+### 2026-10-23 — Session 6: Phase 5 (Sentry Agent Tracing & Privacy Guardrails)
+- **Task 5.1 — Sentry Tracer:** Implemented [`app/telemetry/sentry_tracer.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/telemetry/sentry_tracer.py) providing span tracking for `email.clean`, `ai.gemma.deduplicate`, and `gazette.render`. Enforced `send_default_pii=False`.
+- **Task 5.2 — Privacy Assertion Tests:** Implemented [`tests/test_privacy_guarantees.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/tests/test_privacy_guarantees.py) testing automated PII stripping, ensuring zero email body/subject tokens enter telemetry payloads.
+- **Evidence:** Ran `pytest tests/test_privacy_guarantees.py -v`: 4/4 passed in 0.45s. Total test suite: 15/15 passed.
 
 ---
 
 ## 3. What's Next
 
-- [ ] Execute **Task 5.1**: Implement Sentry Agent Tracing in `app/telemetry/sentry_tracer.py` (`email.clean`, `ai.gemma.deduplicate`, `gazette.render`).
-- [ ] Execute **Task 5.2**: Automated privacy assertion tests in `tests/test_privacy_guarantees.py` ensuring `send_default_pii=False` and zero email tokens transmitted.
+- [ ] Execute **Task 6.1**: Implement Rich Terminal TUI view `app/output/tui_view.py` with formatted gazette tables and Sloth Badge banner.
+- [ ] Execute **Task 6.2**: Implement Retro HTML newspaper generator `app/output/html_generator.py` and Markdown exporter (`GAZETTE-YYYY-MM-DD.md`).
+- [ ] Execute **Task 6.3**: Connect end-to-end execution in `app/main.py`.
 
 ---
 
