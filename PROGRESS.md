@@ -7,46 +7,43 @@
 
 ## 1. Current Status
 
-- **Phase Active:** Phase 3 (Ingestion Layer & Demo CLI Runner)
-- **Current Sprint:** Ingestion & CLI Orchestration
-- **Build Status:** Phase 2 Complete (Green, 4/4 automated tests passing in 0.39s).
+- **Phase Active:** Phase 4 (Gemma 2 Deduplication Engine)
+- **Current Sprint:** Local Ollama Gemma Integration & Cross-Deduplication Prompts
+- **Build Status:** Phase 3 Complete (Green, 8/8 automated tests passing; end-to-end demo runner operational).
 
 ---
 
 ## 2. What's Done
 
 ### 2026-10-23 — Session 1: Documentation Scaffolding & Architecture Lock-In
-- **Scaffolded Core Agent Loop Framework:**
-  - Created [`PRD.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/PRD.md), [`ARCHITECTURE.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/ARCHITECTURE.md), [`ENGINEERING_PLAYBOOK.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/ENGINEERING_PLAYBOOK.md), [`AGENTS.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/AGENTS.md), [`CLAUDE.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/CLAUDE.md), and [`BACKLOG.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/BACKLOG.md).
-  - Created [`docs/README.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/docs/README.md), [`docs/adr/001-local-first-ollama-inference.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/docs/adr/001-local-first-ollama-inference.md), and [`docs/adr/002-deterministic-fluff-stripping.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/docs/adr/002-deterministic-fluff-stripping.md).
-- **Environment Discovery:**
-  - Verified Python 3.13.3 and Ollama 0.40.6 available locally with `gemma4:e4b` loaded.
+- Scaffolded AI Agent Loop framework docs (`PRD.md`, `ARCHITECTURE.md`, `ENGINEERING_PLAYBOOK.md`, `AGENTS.md`, `CLAUDE.md`, `BACKLOG.md`, `PROGRESS.md`, `docs/`).
+- Discovered Python 3.13.3 and local Ollama with `gemma4:e4b`.
 
 ### 2026-10-23 — Session 2: Phase 1 (Environment, Schemas & Fixtures)
-- **Task 1.1 — Packaging & Dependencies:**
-  - Configured [`pyproject.toml`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/pyproject.toml), [`.env.example`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/.env.example), [`.gitignore`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/.gitignore).
-  - Installed and verified dependencies: `beautifulsoup4`, `rich`, `sentry-sdk`, `requests`, `pytest`, `pydantic`, `pydantic-settings`.
-- **Task 1.2 — Data Schemas:**
-  - Implemented [`app/parser/schemas.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/parser/schemas.py) with models for `RawEmail`, `CleanedArticle`, `BigMove`, `ToolRadarItem`, `QuickConcept`, `SlothMetrics`, and `GazettePayload`.
-- **Task 1.3 — Realistic Sample Fixtures:**
-  - Created 4 test newsletters in `tests/fixtures/`: `sample_tldr.html`, `sample_bytebytego.html`, `sample_pycoders.html`, `sample_hacker_newsletter.html`.
+- Configured packaging and verified dependencies (`beautifulsoup4`, `rich`, `sentry-sdk`, `requests`, `pytest`, `pydantic`).
+- Implemented core Pydantic data schemas in `app/parser/schemas.py`.
+- Created 4 test newsletters in `tests/fixtures/`.
 
 ### 2026-10-23 — Session 3: Phase 2 (Deterministic Fluff Stripper)
-- **Task 2.1 — FluffStripper Implementation:**
-  - Created [`app/parser/fluff_stripper.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/parser/fluff_stripper.py) with BeautifulSoup DOM sanitization and regex rules targeting sponsor and partner promotion blocks.
-  - Decomposes navigation, footers, headers, tracking pixels, scripts, and styles.
-  - Accurately tracks word count delta (`raw_word_count` vs `cleaned_word_count`) and `sponsors_removed`.
-- **Task 2.2 — Automated Testing:**
-  - Implemented [`tests/test_fluff_stripper.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/tests/test_fluff_stripper.py) verifying 100% sponsor elimination across all 4 sample fixtures while preserving core technical content.
-  - **Evidence:** Executed `pytest tests/test_fluff_stripper.py -v`: 4/4 passed in 0.39s.
+- Implemented `app/parser/fluff_stripper.py`.
+- Added unit tests in `tests/test_fluff_stripper.py` with 100% sponsor elimination.
+
+### 2026-10-23 — Session 4: Phase 3 (Ingestion Layer & Demo CLI Runner)
+- **Task 3.1 — Local Loader:** Implemented [`app/ingest/local_loader.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/ingest/local_loader.py) to load bundled HTML newsletters.
+- **Task 3.2 — Safe IMAP Client:** Implemented [`app/ingest/imap_client.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/ingest/imap_client.py) using `BODY.PEEK[]` to preserve `\Seen` unread state.
+- **Task 3.3 — CLI Orchestrator:** Implemented [`app/main.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/main.py) and [`app/config.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/config.py). Resolved Windows console UTF-8 encoding.
+- **Evidence:** 
+  - Ran `python -m app.main --demo`: successfully ingested 4 sample newsletters (922 words), stripped 7 sponsor ads down to 674 words (26.9% noise reduction) and printed formatted Rich summary table.
+  - Ran `pytest tests/`: 8/8 tests passed in 0.68s.
 
 ---
 
 ## 3. What's Next
 
-- [ ] Execute **Task 3.1**: Implement `app/ingest/local_loader.py` for offline fixture loading.
-- [ ] Execute **Task 3.2**: Implement TLS IMAP client `app/ingest/imap_client.py` using `BODY.PEEK[]`.
-- [ ] Execute **Task 3.3**: Implement CLI orchestrator `app/main.py` with `--demo` flag and `app/config.py`.
+- [ ] Execute **Task 4.1**: Implement `app/engine/gemma_client.py` for Ollama REST communication.
+- [ ] Execute **Task 4.2**: Implement `app/engine/prompts.py` for zero-fluff cross-deduplication JSON synthesis.
+- [ ] Execute **Task 4.3**: Integrate resilience & fallback handling.
+- [ ] Execute **Task 4.4**: Schema validation test `tests/test_gemma_schema.py`.
 
 ---
 

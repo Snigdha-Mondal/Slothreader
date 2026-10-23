@@ -25,9 +25,9 @@
 ## Phase 3: Ingestion Layer & Demo CLI Runner
 **Exit Goal:** Ingestion pipeline can load from local files (`--demo`) or TLS IMAP, and run through the fluff stripper from the command line.
 
-- [ ] **3.1 Local Loader (`app/ingest/local_loader.py`):** Load and parse bundled fixture files for zero-credential offline demo execution.
-- [ ] **3.2 TLS IMAP Client (`app/ingest/imap_client.py`):** Secure IMAP reader utilizing `BODY.PEEK[]` to ensure unread flags are never modified during read operations.
-- [ ] **3.3 CLI Orchestrator (`app/main.py`):** CLI entry point supporting `--demo` flag, config loading (`app/config.py`), and ingestion pipeline execution.
+- [x] **3.1 Local Loader (`app/ingest/local_loader.py`):** Load and parse bundled fixture files for zero-credential offline demo execution.
+- [x] **3.2 TLS IMAP Client (`app/ingest/imap_client.py`):** Secure IMAP reader utilizing `BODY.PEEK[]` to ensure unread flags are never modified during read operations.
+- [x] **3.3 CLI Orchestrator (`app/main.py`):** CLI entry point supporting `--demo` flag, config loading (`app/config.py`), and ingestion pipeline execution.
 
 ---
 
