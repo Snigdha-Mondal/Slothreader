@@ -90,7 +90,7 @@ class SentryTracer:
         sdk_span = None
         if self.is_active:
             try:
-                sdk_span = sentry_sdk.start_span(op=op, description=description)
+                sdk_span = sentry_sdk.start_span(op=op, name=description or op)
                 sdk_span.__enter__()
                 for k, v in span_record["data"].items():
                     sdk_span.set_data(k, v)
@@ -119,6 +119,8 @@ class SentryTracer:
 
             if sdk_span:
                 try:
+                    for k, v in span_record["data"].items():
+                        sdk_span.set_data(k, v)
                     sdk_span.__exit__(None, None, None)
                 except Exception:
                     pass

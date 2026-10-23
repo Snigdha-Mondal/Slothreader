@@ -69,100 +69,100 @@ def run_pipeline(
             console.print("[yellow]No newsletters found to process.[/yellow]")
             return None
 
-    # Stage 2: Deterministic Fluff Stripping
-    console.print("[cyan]Running deterministic fluff stripper (removing sponsors, footers & tracking pixels)...[/cyan]")
-    stripper = FluffStripper()
-    cleaned_articles: List[CleanedArticle] = []
+        # Stage 2: Deterministic Fluff Stripping
+        console.print("[cyan]Running deterministic fluff stripper (removing sponsors, footers & tracking pixels)...[/cyan]")
+        stripper = FluffStripper()
+        cleaned_articles: List[CleanedArticle] = []
 
-    with tracer.start_span(
-        op="email.clean",
-        description="Deterministic DOM & Sponsor Stripping",
-        data={
-            "raw_emails_count": len(raw_emails),
-            "total_raw_words": sum(e.raw_word_count for e in raw_emails),
-        }
-    ) as span:
-        for email_item in raw_emails:
-            cleaned = stripper.clean_email(email_item)
-            cleaned_articles.append(cleaned)
-        span["data"]["total_cleaned_words"] = sum(a.cleaned_word_count for a in cleaned_articles)
-        span["data"]["sponsors_removed"] = sum(a.sponsors_removed for a in cleaned_articles)
-
-    # Ingestion & Stripping Summary Table
-    table = Table(title="Slothreader: Ingestion & Fluff Stripping Summary", show_header=True, header_style="bold magenta")
-    table.add_column("Publisher / Source", style="cyan")
-    table.add_column("Original Words", justify="right")
-    table.add_column("Cleaned Words", justify="right")
-    table.add_column("Sponsors Dropped", justify="right", style="green")
-    table.add_column("Noise Reduction", justify="right", style="bold yellow")
-
-    total_raw = sum(a.raw_word_count for a in cleaned_articles)
-    total_clean = sum(a.cleaned_word_count for a in cleaned_articles)
-    total_sponsors = sum(a.sponsors_removed for a in cleaned_articles)
-
-    for a in cleaned_articles:
-        reduction_pct = ((a.raw_word_count - a.cleaned_word_count) / a.raw_word_count * 100) if a.raw_word_count else 0
-        table.add_row(
-            a.source,
-            str(a.raw_word_count),
-            str(a.cleaned_word_count),
-            str(a.sponsors_removed),
-            f"{reduction_pct:.1f}%",
-        )
-
-    overall_reduction = ((total_raw - total_clean) / total_raw * 100) if total_raw else 0
-    table.add_section()
-    table.add_row(
-        "[bold]TOTAL[/bold]",
-        f"[bold]{total_raw}[/bold]",
-        f"[bold]{total_clean}[/bold]",
-        f"[bold green]{total_sponsors}[/bold green]",
-        f"[bold yellow]{overall_reduction:.1f}%[/bold yellow]",
-    )
-
-    console.print(table)
-    console.print(f"[dim]Total raw words: {total_raw} → Clean words: {total_clean} ({total_sponsors} sponsor ads eliminated)[/dim]\n")
-
-    if skip_llm:
-        console.print("[dim]Skipping LLM synthesis stage (--no-llm specified).[/dim]")
-        return None
-
-    # Stage 3: Gemma 2 Deduplication Engine
-    gemma = GemmaClient()
-    resolved_model = model_override or gemma.resolve_model()
-    gazette: Optional[GazettePayload] = None
-
-    if use_mock:
-        console.print("[yellow]Using instant offline deterministic synthesis (--mock specified)...[/yellow]")
-        gazette, meta = gemma.mock_deduplicate(cleaned_articles)
-    else:
-        console.print(f"[cyan]Synthesizing and deduplicating cross-newsletter stories with local [bold green]{resolved_model}[/bold green]...[/cyan]")
         with tracer.start_span(
-            op="ai.gemma.deduplicate",
-            description=f"Gemma deduplication via {resolved_model}",
+            op="email.clean",
+            description="Deterministic DOM & Sponsor Stripping",
             data={
-                "ai.model": resolved_model,
-                "articles_count": len(cleaned_articles),
-                "input_words": total_clean,
+                "raw_emails_count": len(raw_emails),
+                "total_raw_words": sum(e.raw_word_count for e in raw_emails),
             }
         ) as span:
-            try:
-                gazette, meta = gemma.deduplicate(cleaned_articles, model_override=resolved_model)
-                span["data"]["duration_seconds"] = meta.get("duration_seconds", 0.0)
-                span["data"]["eval_count"] = meta.get("eval_count", 0)
-            except Exception as e:
-                console.print(f"[yellow]Ollama inference note: {e}[/yellow]")
-                console.print("[cyan]Switching to offline fallback digest...[/cyan]")
-                gazette, meta = gemma.mock_deduplicate(cleaned_articles)
+            for email_item in raw_emails:
+                cleaned = stripper.clean_email(email_item)
+                cleaned_articles.append(cleaned)
+            span["data"]["total_cleaned_words"] = sum(a.cleaned_word_count for a in cleaned_articles)
+            span["data"]["sponsors_removed"] = sum(a.sponsors_removed for a in cleaned_articles)
 
-    # Stage 4: Gazette Output Presentation & Publishing
-    with tracer.start_span(op="gazette.render", description="Publish terminal TUI and offline HTML/MD"):
-        display_gazette(gazette)
-        md_path, html_path = save_gazette_files(gazette, output_dir=output_dir)
-        console.print(f"[green]✓ Saved offline Markdown edition:[/green] [bold]{md_path}[/bold]")
-        console.print(f"[green]✓ Saved offline Retro HTML newspaper:[/green] [bold]{html_path}[/bold]\n")
+        # Ingestion & Stripping Summary Table
+        table = Table(title="Slothreader: Ingestion & Fluff Stripping Summary", show_header=True, header_style="bold magenta")
+        table.add_column("Publisher / Source", style="cyan")
+        table.add_column("Original Words", justify="right")
+        table.add_column("Cleaned Words", justify="right")
+        table.add_column("Sponsors Dropped", justify="right", style="green")
+        table.add_column("Noise Reduction", justify="right", style="bold yellow")
 
-    return gazette
+        total_raw = sum(a.raw_word_count for a in cleaned_articles)
+        total_clean = sum(a.cleaned_word_count for a in cleaned_articles)
+        total_sponsors = sum(a.sponsors_removed for a in cleaned_articles)
+
+        for a in cleaned_articles:
+            reduction_pct = ((a.raw_word_count - a.cleaned_word_count) / a.raw_word_count * 100) if a.raw_word_count else 0
+            table.add_row(
+                a.source,
+                str(a.raw_word_count),
+                str(a.cleaned_word_count),
+                str(a.sponsors_removed),
+                f"{reduction_pct:.1f}%",
+            )
+
+        overall_reduction = ((total_raw - total_clean) / total_raw * 100) if total_raw else 0
+        table.add_section()
+        table.add_row(
+            "[bold]TOTAL[/bold]",
+            f"[bold]{total_raw}[/bold]",
+            f"[bold]{total_clean}[/bold]",
+            f"[bold green]{total_sponsors}[/bold green]",
+            f"[bold yellow]{overall_reduction:.1f}%[/bold yellow]",
+        )
+
+        console.print(table)
+        console.print(f"[dim]Total raw words: {total_raw} → Clean words: {total_clean} ({total_sponsors} sponsor ads eliminated)[/dim]\n")
+
+        if skip_llm:
+            console.print("[dim]Skipping LLM synthesis stage (--no-llm specified).[/dim]")
+            return None
+
+        # Stage 3: Gemma 2 Deduplication Engine
+        gemma = GemmaClient()
+        resolved_model = model_override or gemma.resolve_model()
+        gazette: Optional[GazettePayload] = None
+
+        if use_mock:
+            console.print("[yellow]Using instant offline deterministic synthesis (--mock specified)...[/yellow]")
+            gazette, meta = gemma.mock_deduplicate(cleaned_articles)
+        else:
+            console.print(f"[cyan]Synthesizing and deduplicating cross-newsletter stories with local [bold green]{resolved_model}[/bold green]...[/cyan]")
+            with tracer.start_span(
+                op="ai.gemma.deduplicate",
+                description=f"Gemma deduplication via {resolved_model}",
+                data={
+                    "ai.model": resolved_model,
+                    "articles_count": len(cleaned_articles),
+                    "input_words": total_clean,
+                }
+            ) as span:
+                try:
+                    gazette, meta = gemma.deduplicate(cleaned_articles, model_override=resolved_model)
+                    span["data"]["duration_seconds"] = meta.get("duration_seconds", 0.0)
+                    span["data"]["eval_count"] = meta.get("eval_count", 0)
+                except Exception as e:
+                    console.print(f"[yellow]Ollama inference note: {e}[/yellow]")
+                    console.print("[cyan]Switching to offline fallback digest...[/cyan]")
+                    gazette, meta = gemma.mock_deduplicate(cleaned_articles)
+
+        # Stage 4: Gazette Output Presentation & Publishing
+        with tracer.start_span(op="gazette.render", description="Publish terminal TUI and offline HTML/MD"):
+            display_gazette(gazette)
+            md_path, html_path = save_gazette_files(gazette, output_dir=output_dir)
+            console.print(f"[green]✓ Saved offline Markdown edition:[/green] [bold]{md_path}[/bold]")
+            console.print(f"[green]✓ Saved offline Retro HTML newspaper:[/green] [bold]{html_path}[/bold]\n")
+
+        return gazette
 
 
 def cli_entrypoint():
