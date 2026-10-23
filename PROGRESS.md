@@ -7,9 +7,9 @@
 
 ## 1. Current Status
 
-- **Phase Active:** Phase 2 (Deterministic Fluff Stripper)
-- **Current Sprint:** Parser Implementation & Unit Testing
-- **Build Status:** Phase 1 Complete (Green, verified with 4 realistic test fixtures).
+- **Phase Active:** Phase 3 (Ingestion Layer & Demo CLI Runner)
+- **Current Sprint:** Ingestion & CLI Orchestration
+- **Build Status:** Phase 2 Complete (Green, 4/4 automated tests passing in 0.39s).
 
 ---
 
@@ -29,19 +29,24 @@
 - **Task 1.2 — Data Schemas:**
   - Implemented [`app/parser/schemas.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/parser/schemas.py) with models for `RawEmail`, `CleanedArticle`, `BigMove`, `ToolRadarItem`, `QuickConcept`, `SlothMetrics`, and `GazettePayload`.
 - **Task 1.3 — Realistic Sample Fixtures:**
-  - Created 4 test newsletters in `tests/fixtures/`:
-    - `sample_tldr.html` (Gemma 2 release, Postgres 17, Git 2.47, Neon sponsor, Warp sponsor).
-    - `sample_bytebytego.html` (Gemma 2 sliding window attention, Consistent hashing concept, Datadog & Cloudflare sponsors).
-    - `sample_pycoders.html` (Running Gemma 2 locally in Python, `uv` package manager, Rich 13.7, Sentry sponsor).
-    - `sample_hacker_newsletter.html` (Gemma 2 benchmark on consumer GPUs, Ghostty terminal, Postgres 17 in production, Raycast & Tailscale sponsors).
-  - Verified cross-newsletter overlap on Gemma 2 open weights and Postgres 17, ready for deduplication and fluff stripping tests.
+  - Created 4 test newsletters in `tests/fixtures/`: `sample_tldr.html`, `sample_bytebytego.html`, `sample_pycoders.html`, `sample_hacker_newsletter.html`.
+
+### 2026-10-23 — Session 3: Phase 2 (Deterministic Fluff Stripper)
+- **Task 2.1 — FluffStripper Implementation:**
+  - Created [`app/parser/fluff_stripper.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/parser/fluff_stripper.py) with BeautifulSoup DOM sanitization and regex rules targeting sponsor and partner promotion blocks.
+  - Decomposes navigation, footers, headers, tracking pixels, scripts, and styles.
+  - Accurately tracks word count delta (`raw_word_count` vs `cleaned_word_count`) and `sponsors_removed`.
+- **Task 2.2 — Automated Testing:**
+  - Implemented [`tests/test_fluff_stripper.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/tests/test_fluff_stripper.py) verifying 100% sponsor elimination across all 4 sample fixtures while preserving core technical content.
+  - **Evidence:** Executed `pytest tests/test_fluff_stripper.py -v`: 4/4 passed in 0.39s.
 
 ---
 
 ## 3. What's Next
 
-- [ ] Execute **Task 2.1**: Implement `app/parser/fluff_stripper.py` with DOM stripping and regex sponsor blockers.
-- [ ] Execute **Task 2.2**: Write and run unit tests in `tests/test_fluff_stripper.py` to prove 100% sponsor rejection and verify word count reduction.
+- [ ] Execute **Task 3.1**: Implement `app/ingest/local_loader.py` for offline fixture loading.
+- [ ] Execute **Task 3.2**: Implement TLS IMAP client `app/ingest/imap_client.py` using `BODY.PEEK[]`.
+- [ ] Execute **Task 3.3**: Implement CLI orchestrator `app/main.py` with `--demo` flag and `app/config.py`.
 
 ---
 

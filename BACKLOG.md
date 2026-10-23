@@ -17,8 +17,8 @@
 ## Phase 2: Deterministic Fluff Stripper
 **Exit Goal:** Deterministic parser completely eliminates HTML clutter and sponsor blocks, producing clean, compressed article text with verified word count reduction.
 
-- [ ] **2.1 Fluff Stripper Implementation (`app/parser/fluff_stripper.py`):** BeautifulSoup4 DOM sanitization (strip nav, footers, scripts, tracking pixels) combined with regex rules to eliminate sponsor advertisements (`[Sponsor]`, `Presented by...`, `Thanks to our sponsor...`).
-- [ ] **2.2 Automated Unit Tests (`tests/test_fluff_stripper.py`):** Test suite proving 100% sponsor rejection, clean extraction of headlines/bodies, and accurate before/after word counts.
+- [x] **2.1 Fluff Stripper Implementation (`app/parser/fluff_stripper.py`):** BeautifulSoup4 DOM sanitization (strip nav, footers, scripts, tracking pixels) combined with regex rules to eliminate sponsor advertisements (`[Sponsor]`, `Presented by...`, `Thanks to our sponsor...`).
+- [x] **2.2 Automated Unit Tests (`tests/test_fluff_stripper.py`):** Test suite proving 100% sponsor rejection, clean extraction of headlines/bodies, and accurate before/after word counts.
 
 ---
 
