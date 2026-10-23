@@ -1,17 +1,22 @@
 """Main CLI entrypoint for Slothreader."""
 
 import argparse
+from pathlib import Path
 import sys
-from typing import List
+from typing import List, Optional
 
 from rich.console import Console
 from rich.table import Table
 
 from app.config import settings
-from app.ingest.local_loader import LocalNewsletterLoader
+from app.engine.gemma_client import GemmaClient
 from app.ingest.imap_client import SafeImapClient
+from app.ingest.local_loader import LocalNewsletterLoader
+from app.output.html_generator import save_gazette_files
+from app.output.tui_view import display_gazette
 from app.parser.fluff_stripper import FluffStripper
-from app.parser.schemas import RawEmail, CleanedArticle
+from app.parser.schemas import CleanedArticle, GazettePayload, RawEmail
+from app.telemetry.sentry_tracer import tracer
 
 
 # Ensure UTF-8 output encoding on Windows consoles
@@ -34,37 +39,54 @@ def print_banner():
     )
 
 
-def run_pipeline(demo_mode: bool = True, live_mode: bool = False, skip_llm: bool = False) -> List[CleanedArticle]:
-    """Executes the ingestion and fluff-stripping stages."""
+def run_pipeline(
+    demo_mode: bool = True,
+    live_mode: bool = False,
+    skip_llm: bool = False,
+    model_override: Optional[str] = None,
+    output_dir: Optional[Path] = None,
+) -> Optional[GazettePayload]:
+    """Executes the complete Slothreader pipeline with Sentry Agent Tracing."""
     print_banner()
 
-    # Step 1: Ingestion
+    # Stage 1: Ingestion Layer
     raw_emails: List[RawEmail] = []
-    if live_mode:
-        console.print("[cyan]Connecting to IMAP inbox over TLS (read-only)...[/cyan]")
-        imap_client = SafeImapClient(settings)
-        raw_emails = imap_client.fetch_unread_newsletters()
-        console.print(f"[green]✓ Fetched {len(raw_emails)} unread newsletters from inbox.[/green]")
-    else:
-        console.print("[cyan]Loading bundled demo newsletters for offline evaluation...[/cyan]")
-        loader = LocalNewsletterLoader()
-        raw_emails = loader.load_demo_newsletters()
-        console.print(f"[green]✓ Loaded {len(raw_emails)} bundled sample newsletters.[/green]")
+    with tracer.start_span(op="email.fetch", description="Fetch newsletters"):
+        if live_mode:
+            console.print("[cyan]Connecting to IMAP inbox over TLS (read-only)...[/cyan]")
+            imap_client = SafeImapClient(settings)
+            raw_emails = imap_client.fetch_unread_newsletters()
+            console.print(f"[green]✓ Fetched {len(raw_emails)} unread newsletters from inbox.[/green]")
+        else:
+            console.print("[cyan]Loading bundled demo newsletters for offline evaluation...[/cyan]")
+            loader = LocalNewsletterLoader()
+            raw_emails = loader.load_demo_newsletters()
+            console.print(f"[green]✓ Loaded {len(raw_emails)} bundled sample newsletters.[/green]")
 
     if not raw_emails:
-        console.print("[yellow]No newsletters to process. Inbox clean![/yellow]")
-        return []
+        console.print("[yellow]No newsletters found to process.[/yellow]")
+        return None
 
-    # Step 2: Deterministic Fluff Stripping
+    # Stage 2: Deterministic Fluff Stripping
     console.print("[cyan]Running deterministic fluff stripper (removing sponsors, footers & tracking pixels)...[/cyan]")
     stripper = FluffStripper()
     cleaned_articles: List[CleanedArticle] = []
 
-    for email_item in raw_emails:
-        cleaned = stripper.clean_email(email_item)
-        cleaned_articles.append(cleaned)
+    with tracer.start_span(
+        op="email.clean",
+        description="Deterministic DOM & Sponsor Stripping",
+        data={
+            "raw_emails_count": len(raw_emails),
+            "total_raw_words": sum(e.raw_word_count for e in raw_emails),
+        }
+    ) as span:
+        for email_item in raw_emails:
+            cleaned = stripper.clean_email(email_item)
+            cleaned_articles.append(cleaned)
+        span["data"]["total_cleaned_words"] = sum(a.cleaned_word_count for a in cleaned_articles)
+        span["data"]["sponsors_removed"] = sum(a.sponsors_removed for a in cleaned_articles)
 
-    # Print Ingestion & Stripping Summary Table
+    # Ingestion & Stripping Summary Table
     table = Table(title="Slothreader: Ingestion & Fluff Stripping Summary", show_header=True, header_style="bold magenta")
     table.add_column("Publisher / Source", style="cyan")
     table.add_column("Original Words", justify="right")
@@ -99,7 +121,37 @@ def run_pipeline(demo_mode: bool = True, live_mode: bool = False, skip_llm: bool
     console.print(table)
     console.print(f"[dim]Total raw words: {total_raw} → Clean words: {total_clean} ({total_sponsors} sponsor ads eliminated)[/dim]\n")
 
-    return cleaned_articles
+    if skip_llm:
+        console.print("[dim]Skipping LLM synthesis stage (--no-llm specified).[/dim]")
+        return None
+
+    # Stage 3: Gemma 2 Deduplication Engine
+    gemma = GemmaClient()
+    resolved_model = model_override or gemma.resolve_model()
+    console.print(f"[cyan]Synthesizing and deduplicating cross-newsletter stories with local [bold green]{resolved_model}[/bold green]...[/cyan]")
+
+    gazette: Optional[GazettePayload] = None
+    with tracer.start_span(
+        op="ai.gemma.deduplicate",
+        description=f"Gemma deduplication via {resolved_model}",
+        data={
+            "ai.model": resolved_model,
+            "articles_count": len(cleaned_articles),
+            "input_words": total_clean,
+        }
+    ) as span:
+        gazette, meta = gemma.deduplicate(cleaned_articles, model_override=resolved_model)
+        span["data"]["duration_seconds"] = meta.get("duration_seconds", 0.0)
+        span["data"]["eval_count"] = meta.get("eval_count", 0)
+
+    # Stage 4: Gazette Output Presentation & Publishing
+    with tracer.start_span(op="gazette.render", description="Publish terminal TUI and offline HTML/MD"):
+        display_gazette(gazette)
+        md_path, html_path = save_gazette_files(gazette, output_dir=output_dir)
+        console.print(f"[green]✓ Saved offline Markdown edition:[/green] [bold]{md_path}[/bold]")
+        console.print(f"[green]✓ Saved offline Retro HTML newspaper:[/green] [bold]{html_path}[/bold]\n")
+
+    return gazette
 
 
 def cli_entrypoint():
@@ -107,7 +159,7 @@ def cli_entrypoint():
     parser = argparse.ArgumentParser(description="Slothreader: Local-first newsletter compiler")
     parser.add_argument("--demo", action="store_true", default=True, help="Run with bundled sample newsletters (default)")
     parser.add_argument("--live", action="store_true", help="Fetch unread emails from configured IMAP account")
-    parser.add_argument("--model", type=str, default=settings.gemma_model, help="Ollama model name (e.g. gemma2:2b)")
+    parser.add_argument("--model", type=str, default=None, help="Ollama model override (e.g. gemma2:2b, gemma4:e4b)")
     parser.add_argument("--no-llm", action="store_true", help="Run ingestion and fluff stripping only, skip LLM synthesis")
 
     args = parser.parse_args()
@@ -115,7 +167,12 @@ def cli_entrypoint():
     demo_mode = not live_mode
 
     try:
-        run_pipeline(demo_mode=demo_mode, live_mode=live_mode, skip_llm=args.no_llm)
+        run_pipeline(
+            demo_mode=demo_mode,
+            live_mode=live_mode,
+            skip_llm=args.no_llm,
+            model_override=args.model,
+        )
     except KeyboardInterrupt:
         console.print("\n[yellow]Process cancelled by user.[/yellow]")
         sys.exit(0)

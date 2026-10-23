@@ -52,9 +52,9 @@
 ## Phase 6: The Sloth Gazette Publisher & Sloth Badge
 **Exit Goal:** Beautiful terminal presentation via Rich, offline HTML newspaper generation, and accurate Sloth Badge calculation.
 
-- [ ] **6.1 Rich Terminal TUI (`app/output/tui_view.py`):** Formatted terminal tables, consolidated attribution badges (e.g. `[TLDR + ByteByteGo]`), and the Sloth Badge banner.
-- [ ] **6.2 Retro HTML Newspaper & Markdown (`app/output/html_generator.py`):** Render a single-page printable retro newspaper (`gazette.html`) and clean Markdown document (`GAZETTE-YYYY-MM-DD.md`).
-- [ ] **6.3 Sloth Badge Metrics:** Calculate time saved: `(Raw Ingested Words - Gazette Words) / 200 wpm`.
+- [x] **6.1 Rich Terminal TUI (`app/output/tui_view.py`):** Formatted terminal tables, consolidated attribution badges (e.g. `[TLDR + ByteByteGo]`), and the Sloth Badge banner.
+- [x] **6.2 Retro HTML Newspaper & Markdown (`app/output/html_generator.py`):** Render a single-page printable retro newspaper (`gazette.html`) and clean Markdown document (`GAZETTE-YYYY-MM-DD.md`).
+- [x] **6.3 Sloth Badge Metrics:** Calculate time saved: `(Raw Ingested Words - Gazette Words) / 200 wpm`.
 
 ---
 

@@ -7,9 +7,9 @@
 
 ## 1. Current Status
 
-- **Phase Active:** Phase 6 (The Sloth Gazette Publisher & Sloth Badge)
-- **Current Sprint:** Rich TUI Presentation, Retro HTML Newspaper, and Sloth Badge Metrics
-- **Build Status:** Phase 5 Complete (Green, 15/15 automated tests passing).
+- **Phase Active:** Phase 7 (Agent Skill, Documentation & Final Polish)
+- **Current Sprint:** Agent Skills Standard Packaging, Comprehensive README, and Verification
+- **Build Status:** Phase 6 Complete (Green, 19/19 automated tests passing across full suite).
 
 ---
 
@@ -37,17 +37,22 @@
 - Validated JSON generation schema with 3 tests in `tests/test_gemma_schema.py`.
 
 ### 2026-10-23 — Session 6: Phase 5 (Sentry Agent Tracing & Privacy Guardrails)
-- **Task 5.1 — Sentry Tracer:** Implemented [`app/telemetry/sentry_tracer.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/telemetry/sentry_tracer.py) providing span tracking for `email.clean`, `ai.gemma.deduplicate`, and `gazette.render`. Enforced `send_default_pii=False`.
-- **Task 5.2 — Privacy Assertion Tests:** Implemented [`tests/test_privacy_guarantees.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/tests/test_privacy_guarantees.py) testing automated PII stripping, ensuring zero email body/subject tokens enter telemetry payloads.
-- **Evidence:** Ran `pytest tests/test_privacy_guarantees.py -v`: 4/4 passed in 0.45s. Total test suite: 15/15 passed.
+- Implemented `app/telemetry/sentry_tracer.py` enforcing `send_default_pii=False`.
+- Implemented `tests/test_privacy_guarantees.py` with 4/4 passing tests.
+
+### 2026-10-23 — Session 7: Phase 6 (The Sloth Gazette Publisher & Sloth Badge)
+- **Task 6.1 — Rich Terminal TUI:** Implemented [`app/output/tui_view.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/output/tui_view.py) featuring masthead, Big Moves, Tool Radar, Concept of the Day, and the Sloth Badge of Honor.
+- **Task 6.2 — Retro HTML & Markdown Publisher:** Implemented [`app/output/html_generator.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/output/html_generator.py) generating offline-first standalone retro newspaper HTML and Markdown gazettes.
+- **Task 6.3 — Full Pipeline Integration:** Updated [`app/main.py`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/app/main.py) with all 4 Sentry spans (`email.fetch`, `email.clean`, `ai.gemma.deduplicate`, `gazette.render`).
+- **Evidence:** Ran `pytest tests/test_output.py -v`: 4/4 passed. Full test suite: 19/19 passed in 3.00s.
 
 ---
 
 ## 3. What's Next
 
-- [ ] Execute **Task 6.1**: Implement Rich Terminal TUI view `app/output/tui_view.py` with formatted gazette tables and Sloth Badge banner.
-- [ ] Execute **Task 6.2**: Implement Retro HTML newspaper generator `app/output/html_generator.py` and Markdown exporter (`GAZETTE-YYYY-MM-DD.md`).
-- [ ] Execute **Task 6.3**: Connect end-to-end execution in `app/main.py`.
+- [ ] Execute **Task 7.1**: Implement Agent Skill bundle in `skills/newsletter-digest/SKILL.md` and `skills/newsletter-digest/scripts/run_digest.py`.
+- [ ] Execute **Task 7.2**: Complete `README.md` and `LICENSE` (Apache-2.0).
+- [ ] Execute **Task 7.3**: End-to-end demo execution test and final verification.
 
 ---
 
