@@ -50,23 +50,24 @@ def run_pipeline(
     """Executes the complete Slothreader pipeline with Sentry Agent Tracing."""
     print_banner()
 
-    # Stage 1: Ingestion Layer
-    raw_emails: List[RawEmail] = []
-    with tracer.start_span(op="email.fetch", description="Fetch newsletters"):
-        if live_mode:
-            console.print("[cyan]Connecting to IMAP inbox over TLS (read-only)...[/cyan]")
-            imap_client = SafeImapClient(settings)
-            raw_emails = imap_client.fetch_unread_newsletters()
-            console.print(f"[green]✓ Fetched {len(raw_emails)} unread newsletters from inbox.[/green]")
-        else:
-            console.print("[cyan]Loading bundled demo newsletters for offline evaluation...[/cyan]")
-            loader = LocalNewsletterLoader()
-            raw_emails = loader.load_demo_newsletters()
-            console.print(f"[green]✓ Loaded {len(raw_emails)} bundled sample newsletters.[/green]")
+    with tracer.start_transaction(name="slothreader.daily_digest", op="ai.agent.pipeline"):
+        # Stage 1: Ingestion Layer
+        raw_emails: List[RawEmail] = []
+        with tracer.start_span(op="email.fetch", description="Fetch newsletters"):
+            if live_mode:
+                console.print("[cyan]Connecting to IMAP inbox over TLS (read-only)...[/cyan]")
+                imap_client = SafeImapClient(settings)
+                raw_emails = imap_client.fetch_unread_newsletters()
+                console.print(f"[green]✓ Fetched {len(raw_emails)} unread newsletters from inbox.[/green]")
+            else:
+                console.print("[cyan]Loading bundled demo newsletters for offline evaluation...[/cyan]")
+                loader = LocalNewsletterLoader()
+                raw_emails = loader.load_demo_newsletters()
+                console.print(f"[green]✓ Loaded {len(raw_emails)} bundled sample newsletters.[/green]")
 
-    if not raw_emails:
-        console.print("[yellow]No newsletters found to process.[/yellow]")
-        return None
+        if not raw_emails:
+            console.print("[yellow]No newsletters found to process.[/yellow]")
+            return None
 
     # Stage 2: Deterministic Fluff Stripping
     console.print("[cyan]Running deterministic fluff stripper (removing sponsors, footers & tracking pixels)...[/cyan]")

@@ -56,6 +56,12 @@
     - Saved offline [`GAZETTE-2026-10-23.md`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/GAZETTE-2026-10-23.md) and standalone [`gazette.html`](file:///c:/Users/snigd/OneDrive/Documents/Projects/Slothreader/gazette.html).
     - Traced with Sentry Agent Tracing spans with 0 bytes PII leakage.
 
+### 2026-10-23 — Session 9: Live Sentry Telemetry & Trace Waterfall Verification
+- User configured live Sentry DSN in `.env`.
+- Added top-level pipeline transaction wrapper `start_transaction("slothreader.daily_digest")` and client-side event `flush()` to `app/telemetry/sentry_tracer.py` and `app/main.py`.
+- Verified live end-to-end execution with `gemma2:2b`, successfully streaming complete telemetry trace waterfall (`email.fetch`, `email.clean`, `ai.gemma.deduplicate`, `gazette.render`) to Sentry.
+- All 19 unit tests passing cleanly.
+
 ---
 
 ## 3. What's Next

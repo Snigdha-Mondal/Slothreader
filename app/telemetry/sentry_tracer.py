@@ -123,6 +123,35 @@ class SentryTracer:
                 except Exception:
                     pass
 
+    @contextmanager
+    def start_transaction(self, name: str = "slothreader.digest", op: str = "ai.agent.run") -> Generator[Any, None, None]:
+        """Wraps the entire pipeline in a top-level Sentry transaction."""
+        sdk_tx = None
+        if self.is_active:
+            try:
+                sdk_tx = sentry_sdk.start_transaction(name=name, op=op)
+                sdk_tx.__enter__()
+            except Exception as e:
+                logger.debug(f"Sentry SDK transaction error: {e}")
+
+        try:
+            yield sdk_tx
+        finally:
+            if sdk_tx:
+                try:
+                    sdk_tx.__exit__(None, None, None)
+                except Exception:
+                    pass
+            self.flush()
+
+    def flush(self, timeout: float = 3.0):
+        """Flushes queued events to Sentry before process exit."""
+        if self.is_active:
+            try:
+                sentry_sdk.flush(timeout=timeout)
+            except Exception:
+                pass
+
 
 # Singleton tracer instance
 tracer = SentryTracer()
